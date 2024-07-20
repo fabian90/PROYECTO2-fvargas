@@ -1,0 +1,130 @@
+from flask import Flask, render_template,make_response,request
+from flask_restful import Resource
+from Implementation.producto import  Producto
+from Implementation.ingrediente import  Ingrediente
+from Implementation.productoIngrediente import  ProductoIngrediente
+from funciones import es_sano, contar_calorias, calcular_costo, calcular_rentabilidad, producto_mas_rentable
+from models import ingrediente
+from db import db
+
+class HeladeriaController(Resource):
+    def __init__(self):
+        self.ventas_del_dia = 0
+
+    def get(self):
+        return False
+    
+    @staticmethod
+    def es_ingrediente_sano(self, ingrediente_id):
+        """Verifica si un ingrediente es sano."""
+        ingrediente = Ingrediente.get_ingrediente(ingrediente_id)
+        es_sano(ingrediente.calorias, ingrediente.es_vegetariano)
+        if ingrediente:
+            return ingrediente
+        return False
+    @staticmethod
+    def abastecer_ingrediente(self, ingrediente_id, cantidad):
+        """Abastece un ingrediente específico."""
+        ingrediente = Ingrediente.get_ingrediente(ingrediente_id) 
+        ingrediente.inventario += cantidad
+        if ingrediente:
+            nuevo_inventario = ingrediente.inventario + cantidad
+            Ingrediente.update_ingrediente(ingrediente_id, inventario=nuevo_inventario)
+            db.session.commit()
+            return True
+        return False
+    
+
+    @staticmethod
+    def renovar_inventario_complementos():
+        """Renueva el inventario de todos los complementos."""
+        complementos = Ingrediente.get_by_complemento('complemento')
+        if complementos:
+            for complemento in complementos:
+                Ingrediente.update_ingrediente(complemento.id, inventario=complemento.inventario + 10)  # Asumiendo que la renovación es de 10 unidades
+            db.session.commit()
+            return True
+        return False
+
+    def calcular_calorias_producto(self, producto_id):
+        """Calcula las calorías de un producto dado su Name."""
+        producto = Producto.get_producto(producto_id)
+        if not producto:
+            return 0
+        calorias_total = 0
+        producto_ingredientes=ProductoIngrediente.get_producto_ingrediente_by_producto_id(producto.id)
+        calorias_ingredientes = []
+        for pi in producto_ingredientes:
+            ingrediente = Ingrediente.get_ingrediente(pi.id_ingrediente)
+            if ingrediente:
+                calorias_ingredientes.append(ingrediente.calorias)
+                # Calcula las calorías según el tipo de producto
+                if producto.tipo_producto.nombre_tipo_producto == 'malteada':
+                    calorias_ingredientes.append(200)  # Añade 200 calorías por la crema chantilly
+        return contar_calorias(calorias_ingredientes)
+
+    def calcular_costo_produccion(self, producto_id):
+        """Calcula el costo de producción de un producto dado su ID."""
+        producto_ingredientes =   ProductoIngrediente.get_producto_ingrediente_by_producto_id(id_prod=producto_id)
+        costo_ingredientes = []
+        for pi in producto_ingredientes:
+            ingrediente = Ingrediente.get_ingrediente(pi.id_ingrediente)
+            if ingrediente:
+                costo_ingredientes.append(ingrediente.precio)
+
+        # Si es malteada, añade costo adicional por el vaso
+        producto = Producto.get_producto(producto_id)
+        if producto.tipo_producto.nombre_tipo_producto == 'malteada':
+            costo_ingredientes.append(500)  # Costo del vaso plástico
+
+        return calcular_costo(costo_ingredientes)
+
+    def calcular_rentabilidad_producto(self, producto_id):
+        """Calcula la rentabilidad de un producto dado su ID."""
+        producto = Producto.get_producto(producto_id)        
+        if producto:
+            costo_produccion = self.calcular_costo_produccion(producto_id)
+            return calcular_rentabilidad (producto.precio_publico, costo_produccion)
+        return None
+
+    def producto_mas_rentable(self):
+        """Encuentra el producto más rentable."""
+        productos = Producto.get_all_productos()
+        max_rentabilidad = -float('inf')
+        producto_mas_rentable = None
+
+        for producto in productos:
+            rentabilidad = self.calcular_rentabilidad_producto(producto.id)
+            if rentabilidad > max_rentabilidad:
+                max_rentabilidad = rentabilidad
+                producto_mas_rentable = producto
+
+        return producto_mas_rentable.nombre if producto_mas_rentable else None
+
+    def vender_producto(self, producto_id):
+        """Vende un producto dado su ID si hay suficientes ingredientes."""
+        producto = Producto.query.get(producto_id)
+        if not producto:
+            return False
+
+        producto_ingredientes = ProductoIngrediente.get_producto_ingrediente_by_producto_id(id_producto=producto_id)
+
+        # Verifica si hay suficientes ingredientes
+        for pi in producto_ingredientes:
+            ingrediente = Ingrediente.get_ingrediente(pi.id_ingrediente)
+            if ingrediente:
+                cantidad_necesaria = 1 if ingrediente.tipo == 'complemento' else 0.2
+                if ingrediente.inventario < cantidad_necesaria:
+                    return False
+
+        # Actualiza inventario de los ingredientes
+        for pi in producto_ingredientes:
+            ingrediente = Ingrediente.get_ingrediente(pi.id_ingrediente)
+            if ingrediente:
+                cantidad_necesaria = 1 if ingrediente.tipo == 'complemento' else 0.2
+                ingrediente.usar(cantidad_necesaria)
+
+        # Suma a las ventas del día
+        self.ventas_del_dia += producto.precio_publico
+        db.session.commit()
+        return True

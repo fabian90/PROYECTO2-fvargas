@@ -1,0 +1,11 @@
+from flask import Flask, render_template,make_response,request
+from flask_restful import Resource
+from Implementation.producto import  Producto
+from funciones import es_sano, contar_calorias, calcular_costo, calcular_rentabilidad, producto_mas_rentable
+from db import db
+
+
+class ProductoController(Resource):
+     def get(self):
+          
+          
