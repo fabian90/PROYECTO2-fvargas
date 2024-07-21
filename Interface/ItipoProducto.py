@@ -16,3 +16,7 @@ class ITipoProducto(ABC):
     @abstractmethod
     def delete_tipo_producto(self, id):
         pass
+
+    @abstractmethod
+    def get_all_tipo_productos(self):
+        pass

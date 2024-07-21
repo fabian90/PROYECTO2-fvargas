@@ -2,7 +2,7 @@ from Interface.Iingrediente import IIngrediente
 from models.ingrediente import Ingrediente
 from db import db
 
-class Ingrediente(IIngrediente):
+class IngredienteService(IIngrediente):
     def create_ingrediente(self, nombre, precio, calorias, inventario, es_vegetariano, tipo, sabor, volumen, id_tipo_vaso):
         nuevo_ingrediente = Ingrediente(
             nombre=nombre,
@@ -37,7 +37,7 @@ class Ingrediente(IIngrediente):
             db.session.commit()
         return ingrediente
     
-    def get_by_Complemento(self,name):
+    def get_by_complemento(self,name):
           return Ingrediente.query.filter_by(tipo=name).all()
         
              

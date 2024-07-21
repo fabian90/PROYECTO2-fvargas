@@ -1,6 +1,6 @@
-def es_sano(calorias: int, es_vegetariano: bool) -> bool:
-    """Determina si un ingrediente es sano."""
-    return calorias < 100 or es_vegetariano
+def es_sano(calorias: int) -> bool:
+    """Determina si un producto es sano basado en las calorías."""
+    return calorias < 100
 
 def contar_calorias(ingredientes: list[int]) -> float:
     """Calcula el conteo de calorías de un producto."""

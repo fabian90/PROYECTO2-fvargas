@@ -3,11 +3,8 @@ class ProductoIngrediente(db.Model):
   __tablename__ = "ProductoIngrediente"
 
   id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-  id_producto = db.Column(db.Integer, db.ForeignKey('Producto.id'), nullable=False)
-  id_ingrediente = db.Column(db.Integer, db.ForeignKey('Ingrediente.id'), nullable=False)
-
-  producto = db.relationship("Producto", backref="ingredientes")  # One-to-Many relationship
-  ingrediente = db.relationship("Ingrediente")
+  id_producto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False)
+  id_ingrediente = db.Column(db.Integer, db.ForeignKey('ingrediente.id'), nullable=False)
 
 # Métodos getter
 def get_id(self):

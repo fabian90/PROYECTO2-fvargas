@@ -1,8 +1,9 @@
 from Interface.Iproducto import IProducto
 from models.producto import Producto
+from sqlalchemy.orm import joinedload
 from db import db
 
-class Producto(IProducto):
+class ProductoService(IProducto):
     def create_producto(self, nombre, precio_publico, id_tipo_producto):
         nuevo_producto = Producto(
             nombre=nombre,
@@ -13,8 +14,8 @@ class Producto(IProducto):
         db.session.commit()
         return nuevo_producto
 
-    def get_all_productos() -> list:
-        return Producto.query.all()
+    def get_all_productos(self):
+          return Producto.query.options(joinedload(Producto.tipo_producto)).all()
 
     def get_producto(self, id):
         return Producto.query.get(id)

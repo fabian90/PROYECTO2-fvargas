@@ -2,7 +2,7 @@ from flask import Flask, render_template
 from dotenv import load_dotenv
 from db import db
 from flask_restful import Api,Resource
-
+from Router.heladeriaRouter import heladeria_bp
 import os
 
 app = Flask(__name__)
@@ -24,8 +24,9 @@ if os.path.exists(dotenv_path):
 
 api= Api(app)
 db.init_app(app)
+app.register_blueprint(heladeria_bp)
 with app.app_context():
-        from Controllers.controller import Controlador
+        # from Controllers.controller import Controlador
         db.create_all()
 
         # Registrar blueprint del controlador
@@ -34,10 +35,10 @@ with app.app_context():
 
 # Ruta para mostrar la lista de perros
 # Rutas
-@app.route('/')
-def index():
-    return "¡Bienvenido a la aplicación de Heladeria!"
+# @app.route('/')
+# def index():
+#     return "¡Bienvenido a la aplicación de Heladeria!"
 
-api.add_resource(Controlador,'/consulta_nombre')
+# api.add_resource(Controlador,'/consulta_nombre')
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,12 +1,13 @@
-from Interface.ItipoVaso import ITipoVaso
+from Interface.ItipoProducto import ITipoProducto
 from models.tipoProducto import TipoProducto
 from db import db
 
-class TipoProductoImpl(ITipoVaso):
-    def create_tipo_producto(self, nombre_tipo_producto, descripcion_tipo_producto):
+class TipoProductoService(ITipoProducto):
+
+    def create_tipo_producto(self, nombre, descripcion):
         nuevo_tipo_producto = TipoProducto(
-            nombre_tipo_producto=nombre_tipo_producto,
-            descripcion_tipo_producto=descripcion_tipo_producto
+            nombre_tipo_producto=nombre,
+            descripcion_tipo_producto=descripcion
         )
         db.session.add(nuevo_tipo_producto)
         db.session.commit()
@@ -29,3 +30,6 @@ class TipoProductoImpl(ITipoVaso):
             db.session.delete(tipo_producto)
             db.session.commit()
         return tipo_producto
+
+    def get_all_tipo_productos(self):
+        return TipoProducto.query.all()

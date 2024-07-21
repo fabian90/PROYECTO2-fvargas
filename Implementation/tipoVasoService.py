@@ -2,7 +2,7 @@ from Interface.ItipoVaso import ITipoVaso
 from models.tipoVaso import TipoVaso
 from db import db
 
-class TipoVasoImpl(ITipoVaso):
+class TipoVasoService(ITipoVaso):
     def create_tipo_vaso(self, nombre, descripcion):
         nuevo_tipo_vaso = TipoVaso(
             nombre=nombre,

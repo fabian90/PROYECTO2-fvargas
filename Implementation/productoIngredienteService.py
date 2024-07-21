@@ -1,8 +1,8 @@
-from Interface.productoAnterior import ProductoIngrediente
+from Interface.IproductoIngrediente import IProductoIngrediente
 from models.productoIngrediente import ProductoIngrediente
 from db import db
 
-class ProductoIngrediente(ProductoIngrediente):
+class ProductoIngredienteService(IProductoIngrediente):
     def create_producto_ingrediente(self, id_producto, id_ingrediente):
         nuevo_producto_ingrediente = ProductoIngrediente(
             id_producto=id_producto,

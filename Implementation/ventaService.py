@@ -2,7 +2,7 @@ from Interface.Iventa import IVenta
 from models.venta import Venta
 from db import db
 
-class Venta(IVenta):
+class VentaService(IVenta):
     def create_venta(self, id_producto, cantidad, fecha):
         nueva_venta = Venta(
             id_producto=id_producto,

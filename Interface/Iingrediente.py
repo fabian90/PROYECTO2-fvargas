@@ -17,5 +17,5 @@ class IIngrediente(ABC):
     def delete_ingrediente(self, id):
         pass
     @abstractmethod
-    def get_by_Complemento(self,name):
+    def get_by_complemento(self,name):
         pass

@@ -11,56 +11,46 @@ class Ingrediente(db.Model):
   tipo = db.Column(db.String(255), nullable=False)
   sabor = db.Column(db.String(255))
   volumen = db.Column(db.DECIMAL(10, 2))
-  id_tipo_vaso = db.Column(db.Integer, db.ForeignKey('TipoVaso.id'))
-  tipo_vaso = db.relationship("TipoVaso")
+  id_tipo_vaso = db.Column(db.Integer, db.ForeignKey('tipovaso.id'), nullable=False)
+  tipo_vaso = db.relationship('TipoVaso', backref=db.backref("ingredientes", lazy=True)) 
 
-   # Métodos getter
-def get_id(self):
-    return self.id
 
-def get_nombre(self):
-    return self.nombre
-
-def get_precio(self):
-    return self.precio
-
-def get_calorias(self):
-    return self.calorias
-
-def get_inventario(self):
-    return self.inventario
-
-def get_es_vegetariano(self):
-    return self.es_vegetariano
-
-def get_tipo(self):
-    return self.tipo
-
-def get_sabor(self):
-    return self.sabor
-
-def get_volumen(self):
-    return self.volumen
-
-def get_id_tipo_vaso(self):
-    return self.id_tipo_vaso
-
-def get_tipo_vaso(self):
-    return self.tipo_vaso
-
-def abastecer(self, cantidad):
-    """Reabastece la cantidad del ingrediente."""
-    self.inventario += cantidad
-    db.session.commit()
-
-def usar(self, cantidad):
-    """Usa la cantidad del ingrediente."""
-    if self.inventario >= cantidad:
-        self.inventario -= cantidad
-        db.session.commit()
-        return True
-    return False
-
-@property
 def es_sano(self):
     return self.calorias < 100 or self.es_vegetariano
+def __repr__(self):
+        return f'<Ingrediente {self.nombre}>'
+
+   # Métodos getter
+@property
+def get_id(self):
+    return self.id
+@property
+def get_nombre(self):
+    return self.nombre
+@property
+def get_precio(self):
+    return self.precio
+@property
+def get_calorias(self):
+    return self.calorias
+@property
+def get_inventario(self):
+    return self.inventario
+@property
+def get_es_vegetariano(self):
+    return self.es_vegetariano
+@property
+def get_tipo(self):
+    return self.tipo
+@property
+def get_sabor(self):
+    return self.sabor
+@property
+def get_volumen(self):
+    return self.volumen
+@property
+def get_id_tipo_vaso(self):
+    return self.id_tipo_vaso
+@property
+def get_tipo_vaso(self):
+    return self.tipo_vaso
